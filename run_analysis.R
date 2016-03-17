@@ -1,21 +1,26 @@
 library(dplyr)
 library(reshape2)
 
-## Read the activity names, cleans them and return as a character vector
+## Read the activity names, clean them and return as a character vector
 getCleanActivityNames <- function(dataDir){
     read.table(paste0(dataDir, "/activity_labels.txt"))[,2] %>%
         gsub("_", " ", .)
 }
 
-## Read the labels from features.txt, clean them
-## and return index and name in a data frame
+## Read the feature labels from features.txt, clean them,
+## filter only those for mean() ans std()
+## return index and name in a data frame
 getCleanMeanAndStdLabels <- function(dataDir){
+
+    ## Cleans the names by removing parentheses, hyphens 
+    ## and convert to lower case
     cleanUpNames <- function(x){
         x %>% 
             gsub("\\(\\)", "", .) %>%
             gsub("-", "_", .) %>%
             tolower
     }
+
     labels <- read.table(paste0(dataDir, "/features.txt"), sep = " ") 
     names(labels) <- c("index", "name")
     meanAndStdOnly <- labels[grep("-mean.{2}-|-std.{2}-", labels$name),]
@@ -29,7 +34,7 @@ getCleanMeanAndStdLabels <- function(dataDir){
 ## Loads and merges data$activity as a factor with supplied activityNames
 ## Loads and merges data$subject 
 ## parameters
-##  dataSetName : "test" or "train" to indentify the data set
+##  dataSetName : "test" or "train" to identify the data set
 ##  columns : an integer containing the columns numbers we want
 ##  names : the new names for the columns we want
 ##  activityNames : the labels for converting the activity into a factor
@@ -54,7 +59,7 @@ loadMergeAndCleanData <- function(dataDir, dataSetName, columns, names, activity
     data
 }
 
-## loads and merges and returns the tidy data from the training and test sets
+## load, merge, tidy and return the data from the training and test sets
 getTidyData <- function(dataDir){
     labels <- getCleanMeanAndStdLabels(dataDir)
     
@@ -64,13 +69,17 @@ getTidyData <- function(dataDir){
           loadMergeAndCleanData(dataDir, "test", labels$index, labels$name, activityNames))
 }
 
-## creates the mean values for all observations of each feature by subject and activity
-createTidyAverages <- function(data){
+## summarises the mean values for all observations of each feature by subject and activity
+avgBySubjectAndActivity <- function(data){
     melt(data, id=c("subject", "activity")) %>%
         dcast(subject + activity ~ variable, mean)
 }
 
+## run the analysis and output the tidy dataset to a file
+## parameters
+##   dataDir: the directory containing the unzipped raw data
+##   fileName: the name of the output file
 runAnalysis <- function(dataDir, fileName){
-    write.table(createTidyAverages(getTidyData(dataDir)), file = fileName, row.names = FALSE)
+    write.table(avgBySubjectAndActivity(getTidyData(dataDir)), file = fileName, row.names = FALSE)
 }
 
