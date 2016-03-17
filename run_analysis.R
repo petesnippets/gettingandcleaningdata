@@ -4,9 +4,10 @@
 
 library(dplyr)
 library(reshape2)
+dataDir <- "./data"
 
 ## Read the activity names, clean them and return as a character vector
-getCleanActivityNames <- function(dataDir){
+getCleanActivityNames <- function(){
     read.table(paste0(dataDir, "/activity_labels.txt"))[,2] %>%
         gsub("_", " ", .)
 }
@@ -14,7 +15,7 @@ getCleanActivityNames <- function(dataDir){
 ## Read the feature labels from features.txt, clean them,
 ## filter only those for mean() ans std()
 ## return index and name in a data frame
-getCleanMeanAndStdLabels <- function(dataDir){
+getCleanMeanAndStdLabels <- function(){
 
     ## Cleans the names by removing parentheses, hyphens 
     ## and convert to lower case
@@ -32,6 +33,20 @@ getCleanMeanAndStdLabels <- function(dataDir){
     meanAndStdOnly
 }
 
+## Downloads the data if it does not exist
+ensureDataDownloaded <- function(){
+    if (!file.exists(dataDir)){
+        message("downloading data")
+        download.file("https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip", destfile = "./data.zip")
+        unzip( "./data.zip")
+        file.rename("UCI HAR Dataset", "data")
+        file.remove("./data.zip")
+    }
+    else{
+        message("data already downloaded")
+    }
+}
+
 ## Load the sensor data from the X_ data file
 ## selects the supplied columns from the data
 ## assigns the supplied names to the columns
@@ -44,7 +59,7 @@ getCleanMeanAndStdLabels <- function(dataDir){
 ##  activityNames : the labels for converting the activity into a factor
 ## returns
 ##  tidy data frame for the specified data set
-loadMergeAndCleanData <- function(dataDir, dataSetName, columns, names, activityNames){
+loadMergeAndCleanData <- function(dataSetName, columns, names, activityNames){
     message(paste("loading data for", dataSetName))
     xValueFilePath <- paste0(dataDir, "/", dataSetName, "/X_", dataSetName,  ".txt")
     data <- read.table(xValueFilePath, header = FALSE)[,columns] #only the specified columns
@@ -66,27 +81,29 @@ loadMergeAndCleanData <- function(dataDir, dataSetName, columns, names, activity
 }
 
 ## load, merge, tidy and return the data from the training and test sets
-getTidyData <- function(dataDir){
-    labels <- getCleanMeanAndStdLabels(dataDir)
+getTidyData <- function(){
+    labels <- getCleanMeanAndStdLabels()
     
-    activityNames <- getCleanActivityNames(dataDir)
+    activityNames <- getCleanActivityNames()
     
-    rbind(loadMergeAndCleanData(dataDir, "train", labels$index, labels$name, activityNames),
-          loadMergeAndCleanData(dataDir, "test", labels$index, labels$name, activityNames))
+    rbind(loadMergeAndCleanData("train", labels$index, labels$name, activityNames),
+          loadMergeAndCleanData("test", labels$index, labels$name, activityNames))
 }
 
 ## summarises the mean values for all observations of each feature by subject and activity
 avgBySubjectAndActivity <- function(data){
+    message("reshaping data by subject and activity")
     melt(data, id=c("subject", "activity")) %>%
         dcast(subject + activity ~ variable, mean)
 }
 
 ## run the analysis and output the tidy dataset to a file
 ## parameters
-##   dataDir: the directory containing the unzipped raw data
 ##   fileName: the name of the output file
-runAnalysis <- function(dataDir, fileName){
-    tidy <- avgBySubjectAndActivity(getTidyData(dataDir))
+runAnalysis <- function(fileName){
+    ensureDataDownloaded()
+    data <- getTidyData()
+    tidy <- avgBySubjectAndActivity(data)
     message(paste("writing to file", fileName))
     write.table(tidy, file = fileName, row.names = FALSE)
 }
