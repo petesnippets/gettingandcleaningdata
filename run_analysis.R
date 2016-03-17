@@ -1,3 +1,7 @@
+# Author: Pete Goddard
+
+# Getting and cleaning data week 4 project
+
 library(dplyr)
 library(reshape2)
 
@@ -41,7 +45,7 @@ getCleanMeanAndStdLabels <- function(dataDir){
 ## returns
 ##  tidy data frame for the specified data set
 loadMergeAndCleanData <- function(dataDir, dataSetName, columns, names, activityNames){
-    #Read the X values
+    message(paste("loading data for", dataSetName))
     xValueFilePath <- paste0(dataDir, "/", dataSetName, "/X_", dataSetName,  ".txt")
     data <- read.table(xValueFilePath, header = FALSE)[,columns] #only the specified columns
     
@@ -49,11 +53,13 @@ loadMergeAndCleanData <- function(dataDir, dataSetName, columns, names, activity
     
     #read the y values and assign to data$activity encoded as a factor
     yValueFilePath <- paste0(dataDir, "/", dataSetName, "/y_", dataSetName,  ".txt")
+    message(paste("adding activities for", dataSetName))
     yVals <- read.table(yValueFilePath, header = FALSE)
     data$activity <- factor(yVals$V1, labels = activityNames)
     
     #read the subject id data from file and assign to data$subject
     subjectFilePath <- paste0(dataDir, "/", dataSetName, "/subject_", dataSetName,  ".txt")
+    message(paste("adding subject for", dataSetName))
     subjects <- read.table(subjectFilePath)
     data$subject <- subjects$V1
     data
@@ -80,6 +86,8 @@ avgBySubjectAndActivity <- function(data){
 ##   dataDir: the directory containing the unzipped raw data
 ##   fileName: the name of the output file
 runAnalysis <- function(dataDir, fileName){
-    write.table(avgBySubjectAndActivity(getTidyData(dataDir)), file = fileName, row.names = FALSE)
+    tidy <- avgBySubjectAndActivity(getTidyData(dataDir))
+    message(paste("writing to file", fileName))
+    write.table(tidy, file = fileName, row.names = FALSE)
 }
 
