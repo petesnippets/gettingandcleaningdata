@@ -32,11 +32,76 @@ In addition metadata is available in these files
 * activity_labels.txt maps activity indentifier to label
 * features.txt contains the name of each variable in the X data
 
+#### Note
+
+Each feature is normalised to the range -1:1
+
 ### The tidy output data
 
 A dataset containg the average of each variable for each activity and each subject.
 
 Only the variables for mean and std have been included
+
+#### Fields in the tidy data
+
+The following sensor data is available in the source dataset
+
+* tBodyAcc
+* tGravityAcc
+* tBodyAccJerk
+* tBodyGyro
+* tBodyGyroJerk
+* tBodyAccMag
+* tGravityAccMag
+* tBodyAccJerkMag
+* tBodyGyroMag
+* tBodyGyroJerkMag
+* fBodyAcc
+* fBodyAccJerk
+* fBodyGyro
+* fBodyAccMag
+* fBodyAccJerkMag
+* fBodyGyroMag
+* fBodyGyroJerkMag
+
+Each of these sensors is respresented in the following fields: 
+* mean()-X
+* mean()-Y
+* mean()-Z
+* std()-X
+* std()-Y
+* std()-Z
+
+The fields were filtered so that only fetures containing mean() and std() were selected
+
+The measurment means are output in columns with this format 'tbodyacc_mean_x' and the standard deviation as 'tbodyacc_std_x' etc.
+
+the following data fields for each sensor are not used and are not included in the tidy data:
+
+
+* mad(): Median absolute deviation 
+* max(): Largest value in array
+* min(): Smallest value in array
+* sma(): Signal magnitude area
+* energy(): Energy measure. Sum of the squares divided by the number of values. 
+* iqr(): Interquartile range 
+* entropy(): Signal entropy
+* arCoeff(): Autorregresion coefficients with Burg order equal to 4
+* correlation(): correlation coefficient between two signals
+* maxInds(): index of the frequency component with largest magnitude
+* meanFreq(): Weighted average of the frequency components to obtain a mean frequency
+* skewness(): skewness of the frequency domain signal 
+* kurtosis(): kurtosis of the frequency domain signal 
+* bandsEnergy(): Energy of a frequency interval within the 64 bins of the FFT of each window.
+* angle(): Angle between to vectors.
+
+the following source fields are also not used
+
+* gravityMean
+* tBodyAccMean
+* tBodyAccJerkMean
+* tBodyGyroMean
+* tBodyGyroJerkMean
 
 ### Processing steps
 
