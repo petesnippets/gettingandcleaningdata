@@ -68,7 +68,7 @@ loadMergeAndCleanData <- function(dataSetName, columns, names, activityNames){
     
     #read the y values and assign to data$activity encoded as a factor
     yValueFilePath <- paste0(dataDir, "/", dataSetName, "/y_", dataSetName,  ".txt")
-    message(paste("adding activities for", dataSetName))
+    message(paste("adding activity for", dataSetName))
     yVals <- read.table(yValueFilePath, header = FALSE)
     data$activity <- factor(yVals$V1, labels = activityNames)
     
