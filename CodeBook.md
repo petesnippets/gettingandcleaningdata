@@ -121,7 +121,7 @@ the following source fields are also not used
 
 The dataset produced has: 
 * 180 rows - 30 participants * 6 activities
-* 50 columns - subject, activity + the 48 mean values
+* 50 columns - subject, activity + the 48 mean or std values
 
 #####Citation:
 
