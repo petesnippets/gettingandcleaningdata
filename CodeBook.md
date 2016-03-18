@@ -34,7 +34,7 @@ In addition metadata is available in these files
 
 #### Note
 
-Each feature is normalised to the range -1:1
+Each feature is normalised to the range -1:1 so units are not relevant as original units have been lost during the normalisation.
 
 ### The tidy output data
 
